@@ -1,0 +1,91 @@
+#!/usr/bin/env python3
+import marshal
+import zlib
+import base64
+import os
+import sys
+import hashlib
+import time
+import random
+import platform
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import unpad
+
+print("商业级加密保护系统 v2.0")
+print("加密时间: 2025-11-08 18:01:03")
+print("加密强度: AES-256 + SHA512 + 多层混淆")
+print("作者: 小呆")
+print("=" * 50)
+
+class _P:
+    def __init__(self):
+        self._d = "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"
+        self._s = 3405992522
+        self._t = "2025-11-08 18:01:03"
+        
+    def _c(self):
+        if hasattr(sys, 'gettrace') and sys.gettrace():
+            self._b("调试器检测")
+        if any(["docker" in platform.platform().lower(),"vmware" in platform.platform().lower(),"virtual" in platform.platform().lower(),os.path.exists("/.dockerenv"),os.path.exists("/.dockerinit")]):
+            self._b("虚拟环境检测")
+        s = time.time()
+        for _ in range(1000):
+            hashlib.sha256(os.urandom(64))
+        if time.time() - s > 0.1:
+            self._b("运行时间异常")
+    
+    def _b(self, r):
+        print(f"🚨 安全违规: {r}")
+        print("⚠️  此程序受商业保护，禁止逆向工程")
+        sys.exit(1)
+    
+    def _k(self):
+        s = b'commercial_grade_salt_2025'
+        k = "FIXED_COMMERCIAL_KEY_2025@SECURE"
+        return hashlib.pbkdf2_hmac('sha512', k.encode(), s, 100000, 32)
+    
+    def _a(self, e):
+        try:
+            d = base64.b64decode(e.encode())
+            v = d[:8]
+            t = int.from_bytes(d[8:16], 'big')
+            c = d[16:24]
+            i = d[24:40]
+            ed = d[40:]
+            k = self._k()
+            ec = hashlib.sha256(i + k).digest()[:8]
+            if c != ec:
+                self._b("数据完整性验证失败")
+            cipher = AES.new(k, AES.MODE_CBC, i)
+            cd = unpad(cipher.decrypt(ed), AES.block_size)
+            zd = zlib.decompress(cd)
+            return self._o(zd)
+        except:
+            self._b("解密过程错误")
+    
+    def _o(self, d):
+        o = bytearray()
+        random.seed(self._s)
+        for i, b in enumerate(d):
+            x = random.randint(0, 255)
+            r = b ^ x ^ (i & 0xFF)
+            db = ((r >> 3) | (r << 5)) & 0xFF
+            o.append(db)
+        return bytes(o)
+    
+    def _r(self):
+        self._c()
+        try:
+            dd = self._a(self._d)
+            co = marshal.loads(dd)
+            g = {'__name__': '__main__','__file__': sys.argv[0],'__package__': None,'__builtins__': __builtins__}
+            exec(co, g)
+        except:
+            self._b("代码执行错误")
+
+def _m():
+    p = _P()
+    p._r()
+
+if __name__ == "__main__":
+    _m()

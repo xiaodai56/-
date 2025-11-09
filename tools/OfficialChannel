@@ -1,0 +1,91 @@
+#!/usr/bin/env python3
+import marshal
+import zlib
+import base64
+import os
+import sys
+import hashlib
+import time
+import random
+import platform
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import unpad
+
+print("商业级加密保护系统 v2.0")
+print("加密时间: 2025-11-08 17:59:08")
+print("加密强度: AES-256 + SHA512 + 多层混淆")
+print("作者: 小呆")
+print("=" * 50)
+
+class _P:
+    def __init__(self):
+        self._d = "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"
+        self._s = 3704488865
+        self._t = "2025-11-08 17:59:08"
+        
+    def _c(self):
+        if hasattr(sys, 'gettrace') and sys.gettrace():
+            self._b("调试器检测")
+        if any(["docker" in platform.platform().lower(),"vmware" in platform.platform().lower(),"virtual" in platform.platform().lower(),os.path.exists("/.dockerenv"),os.path.exists("/.dockerinit")]):
+            self._b("虚拟环境检测")
+        s = time.time()
+        for _ in range(1000):
+            hashlib.sha256(os.urandom(64))
+        if time.time() - s > 0.1:
+            self._b("运行时间异常")
+    
+    def _b(self, r):
+        print(f"🚨 安全违规: {r}")
+        print("⚠️  此程序受商业保护，禁止逆向工程")
+        sys.exit(1)
+    
+    def _k(self):
+        s = b'commercial_grade_salt_2025'
+        k = "FIXED_COMMERCIAL_KEY_2025@SECURE"
+        return hashlib.pbkdf2_hmac('sha512', k.encode(), s, 100000, 32)
+    
+    def _a(self, e):
+        try:
+            d = base64.b64decode(e.encode())
+            v = d[:8]
+            t = int.from_bytes(d[8:16], 'big')
+            c = d[16:24]
+            i = d[24:40]
+            ed = d[40:]
+            k = self._k()
+            ec = hashlib.sha256(i + k).digest()[:8]
+            if c != ec:
+                self._b("数据完整性验证失败")
+            cipher = AES.new(k, AES.MODE_CBC, i)
+            cd = unpad(cipher.decrypt(ed), AES.block_size)
+            zd = zlib.decompress(cd)
+            return self._o(zd)
+        except:
+            self._b("解密过程错误")
+    
+    def _o(self, d):
+        o = bytearray()
+        random.seed(self._s)
+        for i, b in enumerate(d):
+            x = random.randint(0, 255)
+            r = b ^ x ^ (i & 0xFF)
+            db = ((r >> 3) | (r << 5)) & 0xFF
+            o.append(db)
+        return bytes(o)
+    
+    def _r(self):
+        self._c()
+        try:
+            dd = self._a(self._d)
+            co = marshal.loads(dd)
+            g = {'__name__': '__main__','__file__': sys.argv[0],'__package__': None,'__builtins__': __builtins__}
+            exec(co, g)
+        except:
+            self._b("代码执行错误")
+
+def _m():
+    p = _P()
+    p._r()
+
+if __name__ == "__main__":
+    _m()

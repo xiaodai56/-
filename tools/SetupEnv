@@ -1,0 +1,29 @@
+pkg update  
+
+pkg upgrade -y
+
+pkg install python -y
+
+pip3 install requests pyyaml tqdm
+
+pkg install coreutils
+
+pkg install bash
+
+pkg install file
+
+pkg install findutils
+
+pkg install curl wget
+
+pip install PyYAML
+
+pip3 install colorama
+
+pkg install qemu-user-i386
+
+pkg install python-pip
+
+pip install pycryptodome
+
+pkg update && pkg install mpv

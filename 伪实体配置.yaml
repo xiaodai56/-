@@ -1,0 +1,6 @@
+hex_markers:
+   start: "5c9c"
+   end: "509c"
+folder_path: "打包/uexp/"
+search_targets:
+   - [403353, 413709] # 湖蓝色名流上衣, 绿洲幻境套装
