@@ -21,6 +21,9 @@ files=(
     "tools/LegacyWeaponBeautify"
     "tools/SubwaySkinBeautify"
     "tools/SetupEnv"
+    "tools/OriginalSkinConfigExtractor"
+    "tools/OriginalSkinEntrance"
+    "tools/OriginalSkinValueExtractor"
 )
 
 # 批量处理
