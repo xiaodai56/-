@@ -24,6 +24,15 @@ files=(
     "tools/OriginalSkinConfigExtractor"
     "tools/OriginalSkinEntrance"
     "tools/OriginalSkinValueExtractor"
+    "tools/NonBlockBeautify"
+    "tools/PackageExtractor"
+    "tools/FeatureCodeExtractor"
+    "tools/QualityBeautify"
+    "tools/ConfigCommenter"
+    "tools/EffectBeautify"
+    "tools/ClothingTexture"
+    "tools/EffectBeautify"
+    "tools/BackpackWeaponTexture"
 )
 
 # 批量处理
