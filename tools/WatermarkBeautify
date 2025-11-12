@@ -1,0 +1,242 @@
+#!/usr/bin/env python
+import os
+import sys
+import time
+import shutil
+from datetime import datetime
+
+# ================ 固定路径配置 ================
+SEARCH_FOLDER = "/data/data/com.termux/files/home/ToT/小包区/"
+CONFIG_FOLDER = "/data/data/com.termux/files/home/ToT"
+CONFIG_FILE = os.path.join(CONFIG_FOLDER, "watermark_rules.txt")
+OUTPUT_FOLDER = "/data/data/com.termux/files/home/ToT/打包/uexp"
+
+# ================ 颜色模块 ================
+class Colors:
+    # 基础颜色
+    RED = '\033[31m'
+    GREEN = '\033[32m'
+    YELLOW = '\033[33m'
+    BLUE = '\033[34m'
+    MAGENTA = '\033[35m'
+    CYAN = '\033[36m'
+    WHITE = '\033[37m'
+    
+    # 亮色
+    BRIGHT_RED = '\033[91m'
+    BRIGHT_GREEN = '\033[92m'
+    BRIGHT_YELLOW = '\033[93m'
+    BRIGHT_BLUE = '\033[94m'
+    BRIGHT_MAGENTA = '\033[95m'
+    BRIGHT_CYAN = '\033[96m'
+    BRIGHT_WHITE = '\033[97m'
+    
+    # 样式
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+    RESET = '\033[0m'
+    
+    # 预设组合（用于命令行界面）
+    TITLE = BRIGHT_MAGENTA + BOLD + UNDERLINE
+    OPTION = BRIGHT_CYAN + BOLD
+    SUCCESS = BRIGHT_GREEN + BOLD
+    WARNING = BRIGHT_YELLOW + BOLD
+    ERROR = BRIGHT_RED + BOLD
+    INFO = BRIGHT_BLUE + BOLD
+    PROGRESS = BRIGHT_GREEN
+    HEADER = BRIGHT_CYAN + BOLD
+
+class ProgressBar:
+    @staticmethod
+    def percentage_progress(current, total, filename="", width=40):
+        """百分比进度条"""
+        if total == 0:
+            return "[░░░░░░░░░░░░░░░░░░░░] 0%"
+        
+        progress = current / total
+        filled_length = int(width * progress)
+        bar = '█' * filled_length + '░' * (width - filled_length)
+        percentage = f"{progress:.1%}"
+        
+        if filename:
+            # 截断长文件名
+            if len(filename) > 25:
+                filename = "..." + filename[-22:]
+            return f"{Colors.PROGRESS}[{bar}] {percentage} | {filename}{Colors.RESET}"
+        else:
+            return f"{Colors.PROGRESS}[{bar}] {percentage}{Colors.RESET}"
+
+# ================ 水印功能模块 ================
+
+def ensure_folder_exists(folder_path):
+    """确保文件夹存在，如果不存在则创建"""
+    if not os.path.exists(folder_path):
+        os.makedirs(folder_path, exist_ok=True)
+        print(f"{Colors.SUCCESS}已创建文件夹: {folder_path}{Colors.RESET}")
+        return True
+    return False
+
+def get_search_folder():
+    """返回固定的待修改文件夹路径，并确保其存在"""
+    ensure_folder_exists(SEARCH_FOLDER)
+    return SEARCH_FOLDER
+
+def get_output_folder():
+    """返回输出文件夹路径，并确保其存在"""
+    ensure_folder_exists(OUTPUT_FOLDER)
+    return OUTPUT_FOLDER
+
+def select_config_file():
+    """返回固定的配置文件路径，检查是否存在"""
+    ensure_folder_exists(CONFIG_FOLDER)
+    
+    # 直接检查配置文件是否存在，不自动创建
+    if not os.path.exists(CONFIG_FILE):
+        print(f"{Colors.ERROR}配置文件不存在: {CONFIG_FILE}{Colors.RESET}")
+        print(f"{Colors.INFO}请创建配置文件并添加替换规则{Colors.RESET}")
+        return None
+    
+    print(f"{Colors.SUCCESS}找到配置文件: {CONFIG_FILE}{Colors.RESET}")
+    return CONFIG_FILE
+
+def load_rules(config_file):
+    """从配置文件加载替换规则"""
+    try:
+        with open(config_file, 'r', encoding='utf-8') as f:
+            rules = []
+            for line_num, line in enumerate(f, 1):
+                line = line.strip()
+                if not line:
+                    continue
+                    
+                parts = line.split(",", maxsplit=1)
+                if len(parts) != 2:
+                    print(f"{Colors.WARNING}第{line_num}行格式错误: {line}{Colors.RESET}")
+                    continue
+                    
+                old_text, new_text = parts
+                print(f"{Colors.INFO}加载配置: '{old_text}' → '{new_text}'{Colors.RESET}")
+                rules.append((old_text.strip(), new_text.strip()))
+                
+            return rules
+            
+    except Exception as e:
+        print(f"{Colors.ERROR}✗ 读取配置文件失败: {e}{Colors.RESET}")
+        return []
+
+def process_files(search_folder, output_folder, rules):
+    """处理文件夹中的所有文件，只将修改的文件复制到输出文件夹"""
+    total = modified = 0
+    file_list = []
+    
+    # 收集所有文件路径
+    for root, _, files in os.walk(search_folder):
+        for file in files:
+            file_list.append(os.path.join(root, file))
+    
+    total_files = len(file_list)
+    
+    if total_files == 0:
+        print(f"{Colors.WARNING}在 {search_folder} 中未找到文件{Colors.RESET}")
+        return total, modified
+    
+    print(f"{Colors.INFO}找到 {total_files} 个文件，开始处理...{Colors.RESET}")
+    
+    for idx, src_file_path in enumerate(file_list):
+        total += 1
+        try:
+            # 显示进度条
+            progress_text = ProgressBar.percentage_progress(
+                idx + 1, total_files, os.path.basename(src_file_path)
+            )
+            print(f"\r{progress_text}", end="", flush=True)
+            
+            with open(src_file_path, 'rb') as f:
+                data = bytearray(f.read())
+            
+            changed = False
+            for old_text, new_text in rules:
+                old_bytes = old_text.encode('utf-16-le')
+                new_bytes = new_text.encode('utf-16-le')
+                if old_bytes in data:
+                    data = data.replace(old_bytes, new_bytes)
+                    changed = True
+            
+            if changed:
+                modified += 1
+                rel_path = os.path.relpath(src_file_path, search_folder)
+                dst_file_path = os.path.join(output_folder, rel_path)
+                os.makedirs(os.path.dirname(dst_file_path), exist_ok=True)
+                with open(dst_file_path, 'wb') as f:
+                    f.write(data)
+                print(f"\n{Colors.SUCCESS}已修改并复制: {os.path.basename(src_file_path)}{Colors.RESET}")
+                    
+        except Exception as e:
+            print(f"\n{Colors.ERROR}✗ 跳过 {os.path.basename(src_file_path)}（错误: {e}）{Colors.RESET}")
+    
+    # 换行结束进度条
+    print()
+    return total, modified
+
+def display_header():
+    """显示彩色标题"""
+    print(f"{Colors.TITLE}{'=' * 60}{Colors.RESET}")
+    print(f"{Colors.TITLE}{title.center(60)}{Colors.RESET}")
+    print(f"{Colors.TITLE}{'=' * 60}{Colors.RESET}")
+    print(f"{Colors.OPTION}源文件夹：{Colors.INFO}{SEARCH_FOLDER}{Colors.RESET}")
+    print(f"{Colors.OPTION}输出文件夹：{Colors.INFO}{OUTPUT_FOLDER}{Colors.RESET}")
+    print(f"{Colors.OPTION}配置文件：{Colors.INFO}{CONFIG_FILE}{Colors.RESET}")
+    print(f"{Colors.OPTION}配置格式：{Colors.INFO}原文本,新文本{Colors.RESET}")
+    print(f"{Colors.HEADER}{'-' * 60}{Colors.RESET}")
+
+def main():
+    """主程序入口"""
+    # 显示彩色标题
+    display_header()
+    
+    # 开始水印替换
+    print(f"\n{Colors.INFO}步骤1: 检查源文件夹...{Colors.RESET}")
+    search_folder = get_search_folder()
+    
+    print(f"{Colors.INFO}步骤2: 检查输出文件夹...{Colors.RESET}")
+    output_folder = get_output_folder()
+    
+    print(f"{Colors.INFO}步骤3: 检查配置文件...{Colors.RESET}")
+    config_file = select_config_file()
+    if not config_file:
+        return
+    
+    # 加载规则
+    print(f"{Colors.INFO}步骤4: 加载替换规则...{Colors.RESET}")
+    rules = load_rules(config_file)
+    if not rules:
+        print(f"{Colors.ERROR}未加载到有效配置{Colors.RESET}")
+        return
+    
+    # 确认操作
+    confirm = input(f"\n{Colors.WARNING}确认开始替换操作？(y/N): {Colors.RESET}").lower()
+    if confirm != 'y':
+        print(f"{Colors.INFO}操作已取消{Colors.RESET}")
+        return
+    
+    # 处理文件
+    print(f"{Colors.INFO}开始扫描并修改文件...{Colors.RESET}")
+    total, modified = process_files(search_folder, output_folder, rules)
+    
+    # 显示彩色结果
+    print(f"\n{Colors.SUCCESS}{'=' * 60}{Colors.RESET}")
+    print(f"{Colors.SUCCESS}修改完成!{Colors.RESET}")
+    print(f"{Colors.SUCCESS}{'=' * 60}{Colors.RESET}")
+    print(f"{Colors.OPTION}扫描文件总数:{Colors.INFO} {total}{Colors.RESET}")
+    print(f"{Colors.OPTION} 修改文件数量:{Colors.SUCCESS} {modified}{Colors.RESET}")
+    print(f"{Colors.OPTION}输出文件夹:{Colors.INFO} {output_folder}{Colors.RESET}")
+    print(f"{Colors.SUCCESS}{'=' * 60}{Colors.RESET}")
+    
+    if modified > 0:
+        print(f"{Colors.SUCCESS}处理完成！{modified} 个修改的文件已保存到输出文件夹{Colors.RESET}")
+        print(f"{Colors.INFO}未修改的文件保持原样{Colors.RESET}")
+    else:
+        print(f"{Colors.WARNING}没有文件被修改{Colors.RESET}")
+
+if __name__ == "__main__":
+    main()
