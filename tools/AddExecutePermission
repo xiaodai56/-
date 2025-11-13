@@ -33,6 +33,7 @@ files=(
     "tools/ClothingTexture"
     "tools/EffectBeautify"
     "tools/BackpackWeaponTexture"
+    "tools/WatermarkBeautify"
 )
 
 # 批量处理

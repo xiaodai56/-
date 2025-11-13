@@ -22,8 +22,4 @@ pip3 install colorama
 
 pkg install qemu-user-i386
 
-pkg install python-pip
-
-pip install pycryptodome
-
-pkg update && pkg install mpv
+pkg install coreutils
