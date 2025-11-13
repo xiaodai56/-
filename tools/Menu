@@ -1,14 +1,13 @@
 #!/data/data/com.termux/files/usr/bin/bash
-# 🔒 终极保护系统 - 与Python同等强度
 
 set -e
 
 kuucbeggvnrgyjf="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"
 
 mswmdgmybw() {
-    echo "🔒 系统验证中..."
+    echo "系统验证中..."
     if [ -n "${DEBUG:-}" ]; then
-        echo "🚨 安全警告: 调试模式检测"
+        echo "安全警告: 调试模式检测"
         exit 1
     fi
 }
@@ -27,36 +26,36 @@ from Crypto.Util.Padding import unpad
 
 def main_decrypt():
     try:
-        # 密钥派生 - 与加密时相同
+        
         key = hashlib.pbkdf2_hmac('sha256', 
                                 b'ULTIMATE_BASH_ENCRYPTION_KEY_2024_XD', 
                                 b'ultimate_bash_encrypt_2024', 
                                 100000, 32)
         
-        # 读取加密数据
+        
         with open(sys.argv[1], 'r', encoding='utf-8') as f:
             encrypted_data = f.read().strip()
         
-        # Base64解码
+        
         encrypted_bytes = base64.b64decode(encrypted_data)
         
-        # 提取IV和密文
+        
         iv = encrypted_bytes[:16]
         ciphertext = encrypted_bytes[16:]
         
-        # AES解密
+        
         cipher = AES.new(key, AES.MODE_CBC, iv)
         compressed_data = unpad(cipher.decrypt(ciphertext), AES.block_size)
         
-        # 解压缩
+        
         original_script = zlib.decompress(compressed_data)
         
-        # 写入临时文件
+        
         with tempfile.NamedTemporaryFile(mode='w', suffix='.sh', delete=False) as f:
             f.write(original_script.decode('utf-8'))
             temp_path = f.name
         
-        # 设置权限并执行
+        
         os.chmod(temp_path, 0o755)
         os.execv(temp_path, [temp_path] + sys.argv[2:])
         
@@ -68,18 +67,17 @@ if __name__ == "__main__":
     main_decrypt()
 PYTHON_SCRIPT
 
-    # 执行解密
+    
     echo "${kuucbeggvnrgyjf}" > "${dvovygokualvnz}_data"
     python3 "${dvovygokualvnz}" "${dvovygokualvnz}_data" "$@"
     
-    # 清理（通常不会执行到这里，因为execv会替换进程）
     rm -f "${dvovygokualvnz}" "${dvovygokualvnz}_data"
 }
 
 nevhaiyywig() {
     echo "========================================"
-    echo "🔒 终极保护系统 v2.0"
-    echo "🛡️  商业级加密强度"
+    echo "终极保护系统v2.0"
+    echo "商业级加密强度"
     echo "========================================"
 }
 
@@ -87,13 +85,13 @@ kqioqirpiiionw() {
     trap 'rm -f /tmp/*_$$.* 2>/dev/null' EXIT
 }
 
-# 主执行流程
+
 main() {
     kqioqirpiiionw
     mswmdgmybw
     nevhaiyywig
     
-    echo "🔓 解密执行中..."
+    echo "启动执行中..."
     vfyuhssmbk "$@"
 }
 
