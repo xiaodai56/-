@@ -1,0 +1,68 @@
+#!/bin/bash
+
+# 颜色定义
+RED='\033[91m'
+GREEN='\033[92m'
+YELLOW='\033[93m'
+BLUE='\033[94m'
+MAGENTA='\033[95m'
+CYAN='\033[96m'
+WHITE='\033[97m'
+BRIGHT_RED='\033[91m'
+BRIGHT_GREEN='\033[92m'
+BRIGHT_YELLOW='\033[93m'
+BRIGHT_BLUE='\033[94m'
+BRIGHT_MAGENTA='\033[95m'
+BRIGHT_CYAN='\033[96m'
+BRIGHT_WHITE='\033[97m'
+BOLD='\033[1m'
+UNDERLINE='\033[4m'
+END='\033[0m'
+
+echo -e "${BRIGHT_CYAN}正在为工具目录下的所有脚本添加执行权限...${END}"
+
+# 要添加权限的文件列表
+files=(
+    "XD/OfficialChannel"
+    "XD/AutoSwitchSkin" 
+    "XD/Pack.bms"
+    "XD/PyToYamlConverter"
+    "XD/Extract.bms"
+    "XD/TxtToYamlConverter"
+    "XD/AutoConfigWriter"
+    "XD/GlobalCodeOutput"
+    "XD/AutoSwitchSkinIcon"
+    "XD/unpack"
+    "XD/quickbms"
+    "XD/TitleBeautify"
+    "XD/AvatarFrameBeautify"
+    "XD/LobbyActionBeautify"
+    "XD/EliminationBroadcastBeautify"
+    "XD/LegacyWeaponBeautify"
+    "XD/SubwaySkinBeautify"
+    "XD/SetupEnv"
+    "XD/OriginalSkinConfigExtractor"
+    "XD/OriginalSkinEntrance"
+    "XD/OriginalSkinValueExtractor"
+    "XD/NonBlockBeautify"
+    "XD/PackageExtractor"
+    "XD/FeatureCodeExtractor"
+    "XD/QualityBeautify"
+    "XD/ConfigCommenter"
+    "XD/EffectBeautify"
+    "XD/ClothingTexture"
+    "XD/EffectBeautify"
+    "XD/BackpackWeaponTexture"
+)
+
+# 批量处理
+for file in "${files[@]}"; do
+    if [ -f "$file" ]; then
+        chmod +x "$file"
+        echo -e "${BRIGHT_GREEN}已为 $file 添加执行权限${END}"
+    else
+        echo -e "${BRIGHT_YELLOW}警告: $file 不存在，跳过${END}"
+    fi
+done
+
+echo -e "${BRIGHT_CYAN}执行权限添加完成！${END}"
